@@ -50,6 +50,9 @@ public_users.get('/author/:author',function (req, res) {
     }
 });
 
+
+
+
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
     const title = req.params.title.toLowerCase();
@@ -79,6 +82,73 @@ public_users.get('/review/:isbn',function (req, res) {
     } else {
         res.status(404).json({ message: `Book with ISBN ${isbn} not found.` });
     }
+});
+
+
+const axios = require('axios'); // 引入 Axios
+
+
+// Promise-based implementation
+public_users.get('/promise', (req, res) => {
+    // 模擬通過 Axios 請求獲取書籍數據
+    axios.get('http://localhost:5001/')
+        .then((response) => {
+            res.status(200).json(response.data);
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Error fetching book list.", error });
+        });
+});
+// Promise-based implementation
+public_users.get('/promise/isbn/:isbn', (req, res) => {
+    const isbn = req.params.isbn;
+    axios.get(`http://localhost:5001/isbn/${isbn}`)
+        .then((response) => {
+            res.status(200).json(response.data); // 返回書籍細節
+        })
+        .catch((error) => {
+            res.status(404).json({ message: `Error fetching book details for ISBN ${isbn}`, error });
+        });
+});
+
+
+public_users.get('/promise/title/:title', (req, res) => {
+    const title = req.params.title.toLowerCase();
+    axios.get('http://localhost:5001/')
+        .then((response) => {
+            // 确保书籍标题和查询一致性
+            const filteredBooks = Object.values(response.data).filter(book =>
+                book.title.toLowerCase().includes(title)
+            );
+            if (filteredBooks.length > 0) {
+                res.status(200).json(filteredBooks);
+            } else {
+                res.status(404).json({ message: `No books found with title containing "${title}".` });
+            }
+        })
+        .catch((error) => {
+            console.error("Error fetching books:", error.message);
+            res.status(500).json({ message: "Error fetching books.", error: error.message });
+        });
+});
+
+
+public_users.get('/title/promise/:title', (req, res) => {
+    const title = req.params.title.toLowerCase();
+    axios.get('http://localhost:5001/')
+        .then((response) => {
+            const filteredBooks = Object.values(response.data).filter(book =>
+                book.title.toLowerCase().includes(title)
+            );
+            if (filteredBooks.length > 0) {
+                res.status(200).json(filteredBooks);
+            } else {
+                res.status(404).json({ message: `No books found with title containing "${title}".` });
+            }
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Error fetching books.", error });
+        });
 });
 
 module.exports.general = public_users;
