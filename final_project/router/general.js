@@ -133,22 +133,4 @@ public_users.get('/promise/title/:title', (req, res) => {
 });
 
 
-public_users.get('/title/promise/:title', (req, res) => {
-    const title = req.params.title.toLowerCase();
-    axios.get('http://localhost:5001/')
-        .then((response) => {
-            const filteredBooks = Object.values(response.data).filter(book =>
-                book.title.toLowerCase().includes(title)
-            );
-            if (filteredBooks.length > 0) {
-                res.status(200).json(filteredBooks);
-            } else {
-                res.status(404).json({ message: `No books found with title containing "${title}".` });
-            }
-        })
-        .catch((error) => {
-            res.status(500).json({ message: "Error fetching books.", error });
-        });
-});
-
 module.exports.general = public_users;
